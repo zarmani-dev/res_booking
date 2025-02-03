@@ -7,6 +7,7 @@ import { TableData } from "@/libs/types";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { format } from "date-fns";
+import { Calendar, CalendarClock } from "lucide-react";
 
 // Initialize the Supabase client
 const supabase = createClient();
@@ -40,12 +41,12 @@ export function TableGrid() {
 
   return (
     <div className="flex flex-col items-center">
-      <div className="mb-8">
+      <div className="mb-8 border border-gray-800 rounded bg-gray-200 dark:bg-gray-300 flex items-center">
         <DatePicker
           selected={selectedDate}
           onChange={(date: Date | null) => setSelectedDate(date || new Date())}
           dateFormat="MMMM d, yyyy"
-          className="p-2 border rounded bg-gray-800"
+          className="p-2 border"
         />
       </div>
       <h2 className="text-2xl font-semibold mb-4">

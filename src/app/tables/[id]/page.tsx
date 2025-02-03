@@ -15,8 +15,10 @@ export default async function Page({
     .single();
 
   return (
-    <div className="max-w-xl mx-auto">
-      <h1 className="text-2xl font-bold">Table Name: {table?.table_name}</h1>
+    <div className="max-w-xl mx-auto p-10">
+      <h1 className="text-2xl font-bold mb-5">
+        Table Name: {table?.table_name}
+      </h1>
       <ReservationForm
         tableId={parseInt(id)}
         table={table}

@@ -22,4 +22,12 @@ export interface ReservationFormData {
   optional_message: string;
   reservation_date: string;
   status: string;
+  table_number?: string;
+  table_id?: number;
+  tables?: {
+    id: number;
+    table_name: string;
+    seats: number;
+    status: string;
+  };
 }

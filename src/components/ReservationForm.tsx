@@ -78,7 +78,7 @@ export function ReservationForm({
         <Input
           id="customer_email"
           type="email"
-          {...register("customer_email", { required: "Email is required" })}
+          {...register("customer_email")}
         />
       </div>
 

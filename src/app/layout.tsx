@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { ThemeProvider as NextThemesProvider } from "next-themes";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -17,9 +18,12 @@ export default function RootLayout({
       <body>
         <NextThemesProvider
           attribute="class"
-          defaultTheme="dark"
-          enableSystem={false}
+          defaultTheme="system"
+          enableSystem
         >
+          <div className="fixed top-4 right-4">
+            <ThemeToggle />
+          </div>
           {children}
         </NextThemesProvider>
       </body>

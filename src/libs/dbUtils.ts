@@ -23,3 +23,17 @@ export async function getTableById(id: string) {
   }
   return { data };
 }
+
+export async function getReservationById(id: string) {
+  const supabase = createClient();
+  const { data, error } = await supabase
+    .from("reservations")
+    .select("*")
+    .eq("id", id)
+    .single();
+  if (error) {
+    console.error("Error fetching reservation:", error);
+    throw error;
+  }
+  return { data };
+}

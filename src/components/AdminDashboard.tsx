@@ -2,7 +2,13 @@
 
 import { useState, useEffect } from "react";
 import { format } from "date-fns";
-import { CalendarIcon } from "lucide-react";
+import {
+  CalendarIcon,
+  XCircle,
+  Clock,
+  CheckCircle,
+  Trash2,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
@@ -28,6 +34,7 @@ import {
 } from "@/components/ui/select";
 import { createClient } from "@/utils/supabase/client";
 import { ReservationFormData } from "@/libs/types";
+import { getReservationById } from "@/libs/dbUtils";
 
 const supabase = createClient();
 
@@ -42,8 +49,18 @@ export function AdminDashboard() {
   const fetchReservations = async () => {
     let query = supabase
       .from("reservations")
-      .select("*")
-      .order(sortBy, { ascending: sortOrder === "asc" })
+      .select(
+        `
+        *,
+        tables (
+          id,
+          table_name,
+          seats,
+          status
+        )
+      `
+      )
+      .order("id")
       .range(
         (currentPage - 1) * reservationsPerPage,
         currentPage * reservationsPerPage - 1
@@ -122,6 +139,26 @@ export function AdminDashboard() {
     }
   };
 
+  const handleDelete = async (id: number) => {
+    const reservation = await getReservationById(id.toString());
+
+    const {} = await supabase
+      .from("tables")
+      .update({ status: "available" })
+      .eq("id", reservation?.data?.table_id);
+
+    const { error: deleteError } = await supabase
+      .from("reservations")
+      .delete()
+      .eq("id", id);
+
+    if (deleteError) {
+      console.error("Error deleting reservation:", deleteError);
+    } else {
+      fetchReservations();
+    }
+  };
+
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-center">
@@ -173,6 +210,7 @@ export function AdminDashboard() {
             <TableHead>Date</TableHead>
             <TableHead>Time</TableHead>
             <TableHead>Customer Name</TableHead>
+            <TableHead>Table Number</TableHead>
             <TableHead>Phone</TableHead>
             <TableHead>Email</TableHead>
             <TableHead>Guests</TableHead>
@@ -181,15 +219,50 @@ export function AdminDashboard() {
           </TableRow>
         </TableHeader>
         <TableBody>
+          {reservations.length === 0 && (
+            <TableRow>
+              <TableCell colSpan={8} className="mx-auto">
+                <div className="flex flex-col items-center justify-center gap-2 py-8 text-muted-foreground animate-in fade-in slide-in-from-top-4 duration-300">
+                  <CalendarIcon className="h-12 w-12 animate-pulse" />
+                  <p className="text-lg font-medium">No reservations found</p>
+                  <p className="text-sm">
+                    Try selecting a different date or removing filters
+                  </p>
+                </div>
+              </TableCell>
+            </TableRow>
+          )}
           {reservations.map((reservation) => (
             <TableRow key={reservation.id}>
               <TableCell>{reservation.reservation_date}</TableCell>
               <TableCell>{reservation.time_slot}</TableCell>
               <TableCell>{reservation.customer_name}</TableCell>
+              <TableCell>{reservation.tables?.table_name}</TableCell>
               <TableCell>{reservation.customer_phone}</TableCell>
               <TableCell>{reservation.customer_email}</TableCell>
               <TableCell>{reservation.guest_count}</TableCell>
-              <TableCell>{reservation.status}</TableCell>
+              <TableCell>
+                <div className="flex items-center gap-2">
+                  {reservation.status === "confirmed" && (
+                    <span className="flex items-center text-green-600">
+                      <CheckCircle className="w-4 h-4 mr-1 animate-in fade-in" />
+                      Confirmed
+                    </span>
+                  )}
+                  {reservation.status === "cancelled" && (
+                    <span className="flex items-center text-red-600">
+                      <XCircle className="w-4 h-4 mr-1 animate-in fade-in" />
+                      Cancelled
+                    </span>
+                  )}
+                  {reservation.status === "pending" && (
+                    <span className="flex items-center text-yellow-600">
+                      <Clock className="w-4 h-4 mr-1 animate-in fade-in" />
+                      Pending
+                    </span>
+                  )}
+                </div>
+              </TableCell>
               <TableCell>
                 <div className="flex space-x-2">
                   <Button
@@ -210,6 +283,15 @@ export function AdminDashboard() {
                     disabled={reservation.status === "cancelled"}
                   >
                     Cancel
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="destructive"
+                    onClick={() =>
+                      reservation.id && handleDelete(reservation.id)
+                    }
+                  >
+                    <Trash2 className="w-4 h-4 mr-1 animate-in fade-in" />
                   </Button>
                 </div>
               </TableCell>
