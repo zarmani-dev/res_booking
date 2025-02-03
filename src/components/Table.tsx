@@ -1,22 +1,45 @@
 import { TableData } from "@/libs/types";
 import Link from "next/link";
+import { format } from "date-fns";
 
-export function Table({ table_name, seats, status, id }: TableData) {
-  const statusColors = {
+interface TableProps extends TableData {
+  selectedDate: Date;
+}
+
+export function Table({
+  id,
+  table_name,
+  seats,
+  status,
+  selectedDate,
+}: TableProps) {
+  const statusColor = {
     available: "bg-green-500",
     pending: "bg-yellow-500",
     reserved: "bg-red-500",
   };
 
-  return (
-    <Link
-      href={`/tables/${id}`}
-      className={`w-20 h-20 ${statusColors[status]} rounded-full flex items-center justify-center relative`}
-    >
-      <div className="text-white text-center">
-        <div className="font-bold text-sm">{table_name}</div>
-        <div className="text-xs">{seats} seats</div>
+  const TableContent = () => {
+    return (
+      <div className={`p-4 rounded-lg border ${statusColor[status]} `}>
+        <h3 className="font-bold">{table_name}</h3>
+        <p>Seats: {seats}</p>
+        <p className="capitalize">Status: {status}</p>
       </div>
-    </Link>
+    );
+  };
+
+  if (status === "available") {
+    return (
+      <Link href={`/tables/${id}?date=${format(selectedDate, "yyyy-MM-dd")}`}>
+        <TableContent />
+      </Link>
+    );
+  }
+
+  return (
+    <div className="cursor-not-allowed">
+      <TableContent />
+    </div>
   );
 }

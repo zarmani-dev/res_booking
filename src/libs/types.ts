@@ -4,6 +4,7 @@ export interface TableData {
   table_name: string;
   seats: number;
   status: "available" | "pending" | "reserved";
+  selectedDate?: Date;
 }
 
 export interface ReservationFormProps {

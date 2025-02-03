@@ -1,6 +1,4 @@
-"use server";
-
-import { createClient } from "@/utils/supabase/server";
+import { createClient } from "@/utils/supabase/client";
 import { ReservationFormData } from "@/libs/types";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";

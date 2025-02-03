@@ -1,18 +1,25 @@
-import { createClient } from "@/utils/supabase/server";
+"use server";
+
+import { createClient } from "@/utils/supabase/client";
 import { ReservationForm } from "@/components/ReservationForm";
 
 export default async function Page({
   params,
+  searchParams,
 }: {
-  params: Promise<{ id: string }>;
+  params: { id: string };
+  searchParams: { date: string };
 }) {
-  const { id } = await params;
-  const supabase = await createClient();
+  const supabase = createClient();
   const { data: table } = await supabase
     .from("tables")
     .select("*")
-    .eq("id", id)
+    .eq("id", params.id)
     .single();
+
+  const selectedDate = searchParams.date
+    ? new Date(searchParams.date)
+    : new Date();
 
   return (
     <div className="max-w-xl mx-auto p-10">
@@ -20,9 +27,9 @@ export default async function Page({
         Table Name: {table?.table_name}
       </h1>
       <ReservationForm
-        tableId={parseInt(id)}
+        tableId={parseInt(params.id)}
         table={table}
-        reservationDate={new Date()}
+        reservationDate={selectedDate}
       />
     </div>
   );

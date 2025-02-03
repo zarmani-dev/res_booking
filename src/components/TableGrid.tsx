@@ -2,51 +2,32 @@
 
 import { useEffect, useState } from "react";
 import { Table } from "./Table";
-import { createClient } from "@/utils/supabase/client";
-import { TableData } from "@/libs/types";
-import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
+import { getTableStatusForDate } from "@/app/actions/tableAvailability";
+import { DatePicker } from "./DatePicker";
 import { format } from "date-fns";
-import { Calendar, CalendarClock } from "lucide-react";
-
-// Initialize the Supabase client
-const supabase = createClient();
+import { TableData } from "@/libs/types";
 
 export function TableGrid() {
+  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [tables, setTables] = useState<TableData[]>([]);
-  const [selectedDate, setSelectedDate] = useState(new Date());
 
   useEffect(() => {
-    async function fetchTables() {
-      const startOfDay = new Date(selectedDate);
-      startOfDay.setHours(0, 0, 0, 0);
-
-      const endOfDay = new Date(selectedDate);
-      endOfDay.setHours(23, 59, 59, 999);
-
-      const { data, error } = await supabase
-        .from("tables")
-        .select("*")
-        .order("id");
-
-      if (error) {
-        console.error("Error fetching tables:", error);
-      } else {
-        setTables(data);
+    const fetchTables = async () => {
+      const tablesData = await getTableStatusForDate(selectedDate);
+      if (tablesData) {
+        setTables(tablesData);
       }
-    }
+    };
 
     fetchTables();
   }, [selectedDate]);
 
   return (
     <div className="flex flex-col items-center">
-      <div className="mb-8 border border-gray-800 rounded bg-gray-200 dark:bg-gray-300 flex items-center">
+      <div className="mb-8 border border-gray-800 dark:border-gray-300 rounded flex items-center">
         <DatePicker
           selected={selectedDate}
-          onChange={(date: Date | null) => setSelectedDate(date || new Date())}
-          dateFormat="MMMM d, yyyy"
-          className="p-2 border"
+          onSelect={(date) => setSelectedDate(date || new Date())}
         />
       </div>
       <h2 className="text-2xl font-semibold mb-4">
@@ -54,7 +35,7 @@ export function TableGrid() {
       </h2>
       <div className="grid grid-cols-3 gap-8 mb-8">
         {tables.map((table) => (
-          <Table key={table.id} {...table} />
+          <Table key={table.id} {...table} selectedDate={selectedDate} />
         ))}
       </div>
       <div className="flex space-x-4">

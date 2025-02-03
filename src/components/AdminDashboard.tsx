@@ -8,6 +8,8 @@ import {
   Clock,
   CheckCircle,
   Trash2,
+  Phone,
+  PhoneCallIcon,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -238,7 +240,14 @@ export function AdminDashboard() {
               <TableCell>{reservation.time_slot}</TableCell>
               <TableCell>{reservation.customer_name}</TableCell>
               <TableCell>{reservation.tables?.table_name}</TableCell>
-              <TableCell>{reservation.customer_phone}</TableCell>
+              <TableCell>
+                <div className="flex items-center gap-2">
+                  {reservation.customer_phone}
+                  <a href={`tel:${reservation.customer_phone}`}>
+                    <PhoneCallIcon className="w-4 h-4 text-blue-600 hover:text-blue-500 cursor-pointer" />
+                  </a>
+                </div>
+              </TableCell>
               <TableCell>{reservation.customer_email}</TableCell>
               <TableCell>{reservation.guest_count}</TableCell>
               <TableCell>
