@@ -1,5 +1,5 @@
 [build]
-  command = "npm run build"
+  command = "npm install && npm run build"
   publish = ".next"
 
 [build.environment]
@@ -7,6 +7,10 @@
   NEXT_PUBLIC_SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imtxd3BhcGFvYndtZWRoYmt5empnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mzg0MjMwNDksImV4cCI6MjA1Mzk5OTA0OX0.QMPv3hXdlyyJb-SZ8VE1SJEbSDrbrW_qBvzzg0UVYK0"
   NODE_VERSION = "18.17.0"
   NPM_VERSION = "9.6.7"
+  NEXT_TELEMETRY_DISABLED = "1"
 
 [functions]
   node_bundler = "esbuild"
+
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
