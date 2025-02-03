@@ -39,10 +39,6 @@ export function AdminDashboard() {
   const [currentPage, setCurrentPage] = useState(1);
   const reservationsPerPage = 10;
 
-  useEffect(() => {
-    fetchReservations();
-  }, [date, sortBy, sortOrder]); // Removed currentPage from dependencies
-
   const fetchReservations = async () => {
     let query = supabase
       .from("reservations")
@@ -65,6 +61,10 @@ export function AdminDashboard() {
       setReservations(data);
     }
   };
+
+  useEffect(() => {
+    fetchReservations();
+  }, [date, sortBy, sortOrder, currentPage]);
 
   const handleConfirm = async (id: number) => {
     const { error: updateError } = await supabase
